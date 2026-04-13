@@ -1,0 +1,16 @@
+---
+
+- hosts: localhost
+  become: true
+  vars_prompt:
+    - name: ansible_become_password
+      prompt: "Enter sudo password"
+      private: true 
+  roles:
+    - packages
+    - docker
+  post_tasks:
+    - name: Complete message
+      debug:
+        msg: |
+          Done.
