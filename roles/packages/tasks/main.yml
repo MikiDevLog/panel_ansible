@@ -1,14 +1,14 @@
 ---
 - name: Dnf cache
-  dnf:
+  ansible.builtin.yum_repository:
     update_cache: true
 
 - name: Update
-  dnf:
+  ansible.builtin.yum_repository:
     state: latest
 
 - name: Packages
-  dnf:
+  ansible.builtin.yum_repository:
     name:
       - btop
       - fastfetch
