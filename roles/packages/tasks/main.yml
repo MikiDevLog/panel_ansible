@@ -1,23 +1,25 @@
 ---
 - name: Dnf cache
-  ansible.builtin.yum_repository:
+  ansible.builtin.dnf:
     update_cache: true
 
-- name: Update
-  ansible.builtin.yum_repository:
+- name: Update packages
+  ansible.builtin.dnf:
+    name: '*'
     state: latest
 
 - name: Packages
-  ansible.builtin.yum_repository:
+  ansible.builtin.dnf:
     name:
       - btop
       - fastfetch
       - curl
       - wget
       - nginx
+    state: present
 
 - name: Check if user in docker group
-  user:
+  ansible.builtin.user:
     name: "{{ ansible_user }}"
     groups: docker
     append: true

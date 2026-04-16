@@ -1,6 +1,6 @@
 ---
 - name: Add Docker
-  ansible.builtin.yum_repository:
+  ansible.builtin.dnf:
     name: Docker repo
     description: Docker Repository
     baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
@@ -9,7 +9,7 @@
     gpgkey: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
 
 - name: Install Docker
-  ansible.builtin.yum_repository:
+  ansible.builtin.dnf:
     name:
       - docker-ce
       - docker-ce-cli
@@ -20,12 +20,12 @@
     update_cache: true
 
 - name: Create docker group
-  group:
+  ansible.builtin.group:
     name: docker
     state: present
 
 - name: Add user to docker group
-  user:
+  ansible.builtin.user:
     name: "{{ ansible_user }}"
     groups: docker
     append: true
