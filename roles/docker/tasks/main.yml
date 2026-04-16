@@ -31,16 +31,16 @@
     append: true
 
 - name: Start and enable Docker
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     state: started
     enabled: true
 
 - name: Test Docker
-  command: docker --version
+  ansible.builtin.command: docker --version
   register: docker_version
   become_user: "{{ ansible_user }}"
 
 - name: Display Docker version
-  debug:
+  ansible.builtin.debug:
     var: docker_version.stdout
