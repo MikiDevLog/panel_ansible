@@ -1,12 +1,15 @@
 ---
-- name: Add Docker repo
-  yum_repository:
-    name: Docker repository
-    description: Official Docker Repository
+- name: Add Docker
+  ansible.builtin.yum_repository:
+    name: Docker repo
+    description: Docker Repository
     baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
+    enabled: true
+    gpgcheck: true
+    gpgkey: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
 
 - name: Install Docker
-  dnf:
+  ansible.builtin.yum_repository:
     name:
       - docker-ce
       - docker-ce-cli

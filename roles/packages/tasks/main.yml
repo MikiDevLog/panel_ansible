@@ -21,4 +21,3 @@
     name: "{{ ansible_user }}"
     groups: docker
     append: true
-  ignore_errors: true
