@@ -17,9 +17,3 @@
       - wget
       - nginx
     state: present
-
-- name: Check if user in docker group
-  ansible.builtin.user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: true
