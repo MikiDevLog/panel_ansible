@@ -1,6 +1,6 @@
 ---
 - name: Add Docker
-  ansible.builtin.dnf:
+  ansible.builtin.yum_repository:
     name: Docker repo
     description: Docker Repository
     baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
