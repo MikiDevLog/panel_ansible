@@ -1,11 +1,7 @@
 domain_name: "name.com"
+subscription_domain: "name.com/api/sub"
 panel_port: 443
 
-db_root_password: "RootPasswordLmao"
-db_password: "PasswordLmao"
-db_database: "nextcloud"
-db_user: ""
 
-ssl_email: "some-mail@mail.com"
 
 panel_docker_dir: "/opt/remnawave"

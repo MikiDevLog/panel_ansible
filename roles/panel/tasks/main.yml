@@ -1,0 +1,141 @@
+---
+- name: Create panel directory
+  ansible.builtin.file:
+    path: /opt/Remnawave
+    state: directory
+    mode: '0755'
+
+- name: Download panel
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/remnawave/backend/refs/heads/main/docker-compose-prod.yml"
+    dest: /opt/Remnawave/docker-compose.yml
+    mode: '0644'
+
+- name: Get .env file
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/remnawave/backend/refs/heads/main/.env.sample"
+    dest: /opt/Remnawave/.env
+    mode: '0644'
+
+- name: Generate JWT secrets
+  ansible.builtin.shell: |
+    openssl rand -hex 64
+  register: jwt_secret
+  changed_when: false
+
+- name: Generate JWT API tokens secret
+  ansible.builtin.shell: |
+    openssl rand -hex 64
+  register: jwt_api_tokens_secret
+  changed_when: false
+
+- name: Generate METRICS_PASS
+  ansible.builtin.shell: |
+    openssl rand -hex 64
+  register: metrics_pass
+  changed_when: false
+
+- name: Generate WEBHOOK_SECRET_HEADER
+  ansible.builtin.shell: |
+    openssl rand -hex 64
+  register: webhook_secret_header
+  changed_when: false
+
+- name: Generate POSTGRES_PASSWORD
+  ansible.builtin.shell: |
+    openssl rand -hex 24
+  register: postgres_password
+  changed_when: false
+
+- name: Update JWT_AUTH_SECRET in .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "^JWT_AUTH_SECRET="
+    line_number: 1
+    insertafter: "^JWT_AUTH_SECRET="
+    insert_lines:
+      - "JWT_AUTH_SECRET={{ jwt_secret.stdout }}"
+    state: present
+
+- name: Update JWT_API_TOKENS_SECRET in .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "^JWT_API_TOKENS_SECRET="
+    line_number: 1
+    insertafter: "^JWT_API_TOKENS_SECRET="
+    insert_lines:
+      - "JWT_API_TOKENS_SECRET={{ jwt_api_tokens_secret.stdout }}"
+    state: present
+
+- name: Update METRICS_PASS in .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "^METRICS_PASS="
+    line_number: 1
+    insertafter: "^METRICS_PASS="
+    insert_lines:
+      - "METRICS_PASS={{ metrics_pass.stdout }}"
+    state: present
+
+- name: Update WEBHOOK_SECRET_HEADER in .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "^WEBHOOK_SECRET_HEADER="
+    line_number: 1
+    insertafter: "^WEBHOOK_SECRET_HEADER="
+    insert_lines:
+      - "WEBHOOK_SECRET_HEADER={{ webhook_secret_header.stdout }}"
+    state: present
+
+- name: Update POSTGRES_PASSWORD in .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "^POSTGRES_PASSWORD="
+    line_number: 1
+    insertafter: "^POSTGRES_PASSWORD="
+    insert_lines:
+      - "POSTGRES_PASSWORD={{ postgres_password.stdout }}"
+    state: present
+
+- name: Update DATABASE_URL password in .env
+  ansible.builtin.replace:
+    path: /opt/Remnawave/.env
+    regexp: '^(DATABASE_URL="postgresql://postgres:)[^"]*(@.*)'
+    replace: '\1{{ postgres_password.stdout }}\2'
+
+- name: Update domain name .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "FRONT_END_DOMAIN"
+    line_number: 1
+    insertafter: "FRONT_END_DOMAIN="
+    insert_lines:
+      - "FRONT_END_DOMAIN={{ domain_name }}"
+    state: present
+
+- name: Update subscription path name .env
+  ansible.builtin.replace_lines:
+    path: /opt/Remnawave/.env
+    after_start_line: "SUB_PUBLIC_DOMAIN"
+    line_number: 1
+    insertafter: "SUB_PUBLIC_DOMAIN="
+    insert_lines:
+      - "SUB_PUBLIC_DOMAIN={{ subscription_domain }}"
+    state: present
+
+- name: Start NC containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ opt/remnawave }}"
+    state: present
+  become_user: "{{ ansible_user }}"
+
+- name: Wait for panel to be healthy
+  ansible.builtin.uri:
+    url: "http://localhost:3000/health"
+    method: GET
+    status_code: 200
+  register: health_check
+  retries: 10
+  delay: 15
+  until: health_check.status == 200
+  
