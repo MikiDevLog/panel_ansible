@@ -1,7 +1,3 @@
-domain_name: "name.com"
+panel_domain: "name.com"
 subscription_domain: "name.com/api/sub"
-panel_port: 443
 
-
-
-panel_docker_dir: "/opt/remnawave"

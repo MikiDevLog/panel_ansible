@@ -2,12 +2,30 @@
 - hosts: all
   become: true
   vars_prompt:
+    - name: ansible_host
+      prompt: "Enter host ip"
+      private: false
+
+    - name: ansible_ssh_private_key_file
+      prompt: "Enter path to SSH private key file. Usually /home/user/.ssh/id_rsa"
+      private: false
+
+    - name: ansible_user
+      prompt: "Enter host name"
+      private: false
+
     - name: ansible_become_password
-      prompt: "Enter sudo password"
+      prompt: "Enter host password"
       private: true
+
+    - name: panel_domain
+      prompt: "Enter panel domain (e.g. panel.name.com)"
+      private: false
+
   roles:
     - packages
     - docker
+    - panel
   post_tasks:
     - name: Complete message
       ansible.builtin.debug:
