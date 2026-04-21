@@ -101,7 +101,8 @@
     regexp: "^SUB_PUBLIC_DOMAIN=.+"
     replace: "SUB_PUBLIC_DOMAIN={{ subscription_domain }}"
 
-- name: Start NC containers
+- name: Start panel containers
   community.docker.docker_compose_v2:
     project_src: "{{ panel_docker_dir }}"
     state: present
+  become_user: "{{ ansible_user }}"

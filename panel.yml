@@ -14,18 +14,19 @@
       prompt: "Enter host name"
       private: false
 
+    - name: panel_docker_dir
+      prompt: "Enter path to panel docker directory. Usually /opt/remnawave"
+      private: false
+
     - name: ansible_become_password
       prompt: "Enter host password"
       private: true
-
-    - name: panel_domain
-      prompt: "Enter panel domain (e.g. panel.name.com)"
-      private: false
 
   roles:
     - packages
     - docker
     - panel
+    - reversproxy
   post_tasks:
     - name: Complete message
       ansible.builtin.debug:

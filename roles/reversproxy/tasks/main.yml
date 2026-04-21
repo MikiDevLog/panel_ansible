@@ -30,30 +30,33 @@
     content: |
       services:
         caddy:
-        image: caddy:2.9
-        container_name: 'caddy'
-        hostname: caddy
-        restart: always
-        ports:
+          image: caddy:2.9
+          container_name: 'caddy'
+          hostname: caddy
+          restart: always
+          ports:
             - '0.0.0.0:443:443'
             - '0.0.0.0:80:80'
-        networks:
+          networks:
             - remnawave-network
-        volumes:
+          volumes:
             - ./Caddyfile:/etc/caddy/Caddyfile
             - caddy-ssl-data:/data
 
-        networks:
-            remnawave-network:
-                name: remnawave-network
-                driver: bridge
-                external: true
+      networks:
+        remnawave-network:
+          name: remnawave-network
+          driver: bridge
+          external: true
 
-        volumes:
-            caddy-ssl-data:
-                driver: local
-                external: false
-                name: caddy-ssl-data
+      volumes:
+        caddy-ssl-data:
+          driver: local
+          external: false
+          name: caddy-ssl-data
 
-- name: Start Caddy container
-  ansible.builtin.command: docker compose up -d && docker compose logs -f -t
+- name: Start Caddy containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ panel_docker_dir }}/caddy"
+    state: present
+  become_user: "{{ ansible_user }}"
