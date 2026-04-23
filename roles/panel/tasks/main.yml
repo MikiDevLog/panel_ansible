@@ -78,16 +78,10 @@
     replace: "POSTGRES_PASSWORD={{ postgres_password.stdout }}"
 
 - name: Update DATABASE_URL in .env
-  ansible.builtin.lineinfile:
+  ansible.builtin.replace:
     path: "{{ panel_docker_dir }}/.env"
-    regexp: '^DATABASE_URL='
-    line: 'DATABASE_URL="postgresql://postgres:{{ postgres_password.stdout }}@localhost:5432/db"'
-
-  # - name: Update DATABASE_URL password in .env
-  # ansible.builtin.replace:
-  #    path: "{{ panel_docker_dir }}/.env"
-  #    regexp: "^(DATABASE_URL=\"postgresql://postgres:)[^\"*(@.*)"
-  #    replace: "\\1{{ postgres_password.stdout }}\\2"
+    regexp: '^DATABASE_URL=.+'
+    replace: 'DATABASE_URL="postgresql://postgres:{{ postgres_password.stdout }}@remnawave-db:5432/postgres"'
 
 - name: Update domain name .env
   ansible.builtin.replace:
